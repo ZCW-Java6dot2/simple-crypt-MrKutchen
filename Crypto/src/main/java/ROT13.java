@@ -1,8 +1,12 @@
-import static java.lang.Character.isLowerCase;
-import static java.lang.Character.isUpperCase;
-import static java.lang.Character.toLowerCase;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
-public class ROT13  {
+public class ROT13 {
     private Character cs;
     private Character cf;
 
@@ -16,27 +20,25 @@ public class ROT13  {
         cf = 'n';
     }
 
-
     public String crypt(String text) throws UnsupportedOperationException {
-        StringBuilder answer = new StringBuilder();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
-            char ch = text.charAt(i);
-            if (ch >= 'a' && ch <= 'm') {
-                ch += 13;
-            } else if (ch >= 'A' && ch <= 'M') {
-                ch += 13;
-            } else if (ch >= 'n' && ch <= 'z') {
-                ch -= 13;
-            } else if (ch >= 'N' && ch <= 'Z') {
-                ch -= 13;
+            if (Character.isUpperCase(text.charAt(i))) {
+                char ch = (char) (((int) text.charAt(i) +
+                        13 - 65) % 26 + 65);
+                result.append(ch);
+            } else if (Character.isLowerCase(text.charAt(i))) {
+                char ch = (char) (((int) text.charAt(i) +
+                        13 - 97) % 26 + 97);
+                result.append(ch);
+            } else {
+                result.append(text.charAt(i));
             }
-            answer.append(ch);
         }
-        return answer.toString();
+        return result.toString();
     }
 
     public String encrypt(String text) {
-
         return crypt(text);
     }
 
@@ -49,20 +51,54 @@ public class ROT13  {
         StringBuilder answer = new StringBuilder();
         char[] stringS = s.toCharArray();
         //get starting index
-        for (int i=0; i<stringS.length; i++){
-            if (stringS[i] == c){
+        for (int i = 0; i < stringS.length; i++) {
+            if (stringS[i] == c) {
                 startIndex = i;
             }
         }
         //fill first half of string with last bit of array
-        for (int i=startIndex; i<stringS.length; i++){
+        for (int i = startIndex; i < stringS.length; i++) {
             answer.append(stringS[i]);
         }
         //fill last half of string with first bit of array
-        for (int i=0; i<startIndex; i++){
+        for (int i = 0; i < startIndex; i++) {
             answer.append(stringS[i]);
         }
         return answer.toString();
+    }
+
+    public void encryptFile(File file){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("sonnet18.enc")));
+            String line;
+            while ((line = reader.readLine()) != null){
+                writer.write(encrypt(line) + "\n");
+            }
+            reader.close();
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void decryptFile(File file){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("sonnet18.dec")));
+            String line;
+            while ((line = reader.readLine()) != null){
+                writer.write(decrypt(line) + "\n");
+            }
+            reader.close();
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

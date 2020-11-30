@@ -1,4 +1,13 @@
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -73,6 +82,7 @@ public class ROT13Test {
         // Then
         assertTrue(actual2.equals(A2));
     }
+
     @Test
     public void cryptTest2() {
         // Given
@@ -88,4 +98,28 @@ public class ROT13Test {
         assertTrue(actual.equals(Q1));
     }
 
+    @Test
+    public void testEncryptionDecryptionWriter(){
+        ROT13 cipher = new ROT13();
+
+        cipher.encryptFile(new File("sonnet18.txt"));
+        cipher.decryptFile(new File("sonnet18.enc"));
+        try {
+            BufferedReader reader1 = new BufferedReader(new FileReader("sonnet18.txt"));
+            BufferedReader reader2 = new BufferedReader(new FileReader("sonnet18.dec"));
+            String line1;
+            String line2;
+            while (reader1.readLine() != null && reader2.readLine() != null){
+                line1 = reader1.readLine();
+                line2 = reader2.readLine();
+                Assert.assertEquals(line1, line2);
+            }
+            reader1.close();
+            reader2.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
